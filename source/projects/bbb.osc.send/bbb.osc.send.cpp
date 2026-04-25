@@ -8,6 +8,10 @@
 
 using namespace c74::min;
 
+static std::string to_string(const symbol& s) {
+    return std::string((const char*)s);
+}
+
 class bbb_osc_send : public object<bbb_osc_send> {
 public:
     MIN_DESCRIPTION{"Send OSC messages over UDP"};
@@ -20,7 +24,7 @@ public:
         description{"Destination IP address"},
         setter{[this](const atoms& args, int) -> atoms {
             if(args.size() > 0) {
-                setup_sender(std::string(args[0]), static_cast<int>(port));
+                setup_sender(to_string(args[0]), static_cast<int>(port));
             }
             return args;
         }}
@@ -30,7 +34,7 @@ public:
         description{"Destination UDP port"},
         setter{[this](const atoms& args, int) -> atoms {
             if(args.size() > 0) {
-                setup_sender(std::string(host), static_cast<int>(args[0]));
+                setup_sender(to_string(host), static_cast<int>(args[0]));
             }
             return args;
         }}
@@ -73,7 +77,7 @@ private:
 
     void send_osc(const atom& addr_atom, const atoms& args) {
         if(!sender_) {
-            setup_sender(std::string(host), static_cast<int>(port));
+            setup_sender(to_string(host), static_cast<int>(port));
         }
         if(!sender_) return;
 
@@ -85,20 +89,20 @@ private:
 
         bbb::osc::message mess(address);
         for(const auto& arg : args) {
-            if(arg.type() == atom::types::int_) {
+            if(arg.a_type == c74::max::A_LONG) {
                 if(use_long) {
                     mess.push(bbb::osc::Tag::Int64, static_cast<std::int64_t>(static_cast<int>(arg)));
                 } else {
                     mess.push(bbb::osc::Tag::Int32, static_cast<std::int32_t>(static_cast<int>(arg)));
                 }
-            } else if(arg.type() == atom::types::float64) {
+            } else if(arg.a_type == c74::max::A_FLOAT) {
                 if(use_double) {
                     mess.push(bbb::osc::Tag::Double, static_cast<double>(arg));
                 } else {
                     mess.push(bbb::osc::Tag::Float, static_cast<float>(static_cast<double>(arg)));
                 }
-            } else if(arg.type() == atom::types::symbol) {
-                mess.push(bbb::osc::Tag::String, std::string(arg));
+            } else if(arg.a_type == c74::max::A_SYM) {
+                mess.push(bbb::osc::Tag::String, static_cast<std::string>(arg));
             }
         }
         sender_->send(mess);

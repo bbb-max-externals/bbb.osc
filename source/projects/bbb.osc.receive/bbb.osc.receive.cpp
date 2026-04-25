@@ -9,22 +9,31 @@
 #include <map>
 #include <vector>
 #include <functional>
-#include <utility>
+#include <string>
 
 using namespace c74::min;
 
+static std::string to_string(const symbol& s) {
+    return std::string((const char*)s);
+}
+
 class broadcast_receiver : public bbb::osc::receiver {
 public:
-    void add_callback(std::function<void(const bbb::osc::message&)> cb) {
+    struct tagged_callback {
+        void* owner;
+        std::function<void(const bbb::osc::message&)> fn;
+    };
+
+    void add_callback(void* owner, std::function<void(const bbb::osc::message&)> cb) {
         auto lock = std::lock_guard<std::mutex>(mtx_);
-        callbacks_.push_back(std::move(cb));
+        callbacks_.push_back({owner, std::move(cb)});
     }
 
     void remove_callback(void* owner) {
         auto lock = std::lock_guard<std::mutex>(mtx_);
         callbacks_.erase(
             std::remove_if(callbacks_.begin(), callbacks_.end(),
-                [owner](const auto& cb) { return cb.owner == owner; }),
+                [owner](const tagged_callback& cb) { return cb.owner == owner; }),
             callbacks_.end()
         );
     }
@@ -38,7 +47,7 @@ public:
         std::vector<bbb::osc::message> messages;
         {
             bbb::osc::message mess;
-            while(queued_messages.try_receive(mess)) {
+            while(queued_messages.try_receive(mess, 0)) {
                 messages.push_back(std::move(mess));
             }
         }
@@ -49,11 +58,6 @@ public:
             }
         }
     }
-
-    struct tagged_callback {
-        void* owner;
-        std::function<void(const bbb::osc::message&)> fn;
-    };
 
 private:
     mutable std::mutex mtx_;
@@ -119,7 +123,7 @@ public:
         description{"UDP port to bind"},
         setter{[this](const atoms& args, int) -> atoms {
             if(args.size() > 0) {
-                rebind(static_cast<int>(args[0]), std::string(bind_ip));
+                rebind(static_cast<int>(args[0]), to_string(bind_ip));
             }
             return args;
         }}
@@ -129,7 +133,7 @@ public:
         description{"Local IP address of interface to bind"},
         setter{[this](const atoms& args, int) -> atoms {
             if(args.size() > 0) {
-                rebind(static_cast<int>(port), std::string(args[0]));
+                rebind(static_cast<int>(port), to_string(bind_ip));
             }
             return args;
         }}
@@ -171,7 +175,7 @@ private:
     };
 
     void init() {
-        rebind(static_cast<int>(port), std::string(bind_ip));
+        rebind(static_cast<int>(port), to_string(bind_ip));
         m_poll_timer.delay(1);
     }
 
@@ -184,17 +188,17 @@ private:
         }
         receiver_ = recv;
         auto* self = this;
-        receiver_->add_callback({self, [self](const bbb::osc::message& mess) {
+        receiver_->add_callback(self, [self](const bbb::osc::message& mess) {
             auto lock = std::lock_guard<std::mutex>(self->pending_mtx_);
             self->pending_.push_back(mess);
-        }});
+        });
     }
 
     void close() {
         if(receiver_) {
-            receiver_->remove_callback(this);
             auto p = static_cast<std::uint16_t>(static_cast<int>(port));
-            auto ip = std::string(bind_ip);
+            auto ip = to_string(bind_ip);
+            receiver_->remove_callback(this);
             receiver_.reset();
             receiver_registry::shared().release(p, ip);
         }

@@ -12,6 +12,9 @@ set(SOURCE_FILES
 
 include(${C74_MIN_API_DIR}/script/min-pretarget.cmake)
 
+add_library(${PROJECT_NAME} MODULE ${SOURCE_FILES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${C74_INCLUDES})
+
 set(BBB_OSC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../deps/bbb-osc")
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${BBB_OSC_DIR}/include
