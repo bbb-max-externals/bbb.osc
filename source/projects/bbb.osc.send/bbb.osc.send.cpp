@@ -24,7 +24,7 @@ public:
         description{"Destination IP address"},
         setter{[this](const atoms& args, int) -> atoms {
             if(args.size() > 0) {
-                setup_sender(to_string(args[0]), static_cast<int>(port));
+                setup_sender(to_string(symbol(args[0])), static_cast<int>(port));
             }
             return args;
         }}
@@ -50,7 +50,7 @@ public:
 
     message<> send_msg{this, "send", "Send an OSC message: send /address args...",
         MIN_FUNCTION {
-            if(args.size() < 2) return {};
+            if(args.size() < 1) return {};
             send_osc(args[0], atoms(args.begin() + 1, args.end()));
             return {};
         }
@@ -59,6 +59,17 @@ public:
     message<> anything_msg{this, "anything", "Send using selector as OSC address",
         MIN_FUNCTION {
             send_osc(args[0], atoms(args.begin() + 1, args.end()));
+            return {};
+        }
+    };
+
+    message<> dump_msg{this, "dump", "Print current status to console",
+        MIN_FUNCTION {
+            cout << "bbb.osc.send status:" << endl;
+            cout << "  host: " << to_string(host) << endl;
+            cout << "  port: " << port << endl;
+            cout << "  @long: " << (use_long ? "on" : "off") << endl;
+            cout << "  @double: " << (use_double ? "on" : "off") << endl;
             return {};
         }
     };
@@ -81,7 +92,7 @@ private:
         }
         if(!sender_) return;
 
-        std::string address = std::string(addr_atom);
+        std::string address = to_string(symbol(addr_atom));
         if(address.empty() || address[0] != '/') {
             cerr << "bbb.osc.send: invalid OSC address: " << address << endl;
             return;
@@ -102,7 +113,7 @@ private:
                     mess.push(bbb::osc::Tag::Float, static_cast<float>(static_cast<double>(arg)));
                 }
             } else if(arg.a_type == c74::max::A_SYM) {
-                mess.push(bbb::osc::Tag::String, static_cast<std::string>(arg));
+                mess.push(bbb::osc::Tag::String, to_string(symbol(arg)));
             }
         }
         sender_->send(mess);

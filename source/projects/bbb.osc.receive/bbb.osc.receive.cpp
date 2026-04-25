@@ -10,11 +10,47 @@
 #include <vector>
 #include <functional>
 #include <string>
+#include <algorithm>
 
 using namespace c74::min;
 
 static std::string to_string(const symbol& s) {
     return std::string((const char*)s);
+}
+
+static bool glob_match(const std::string& pattern, const std::string& address) {
+    if(pattern.empty()) return true;
+    if(pattern == "*") return true;
+    if(pattern.find('*') == std::string::npos && pattern.find('?') == std::string::npos) {
+        return pattern == address;
+    }
+    std::size_t pi = 0, ai = 0;
+    std::size_t star_pos = std::string::npos;
+    std::size_t star_ai = 0;
+    while(ai < address.size()) {
+        if(pi < pattern.size()) {
+            if(pattern[pi] == '*') {
+                star_pos = pi;
+                star_ai = ai;
+                pi++;
+                continue;
+            }
+            if(pattern[pi] == '?' || pattern[pi] == address[ai]) {
+                pi++;
+                ai++;
+                continue;
+            }
+        }
+        if(star_pos != std::string::npos) {
+            star_ai++;
+            ai = star_ai;
+            pi = star_pos + 1;
+            continue;
+        }
+        return false;
+    }
+    while(pi < pattern.size() && pattern[pi] == '*') pi++;
+    return pi == pattern.size();
 }
 
 class broadcast_receiver : public bbb::osc::receiver {
@@ -142,9 +178,35 @@ public:
         }}
     };
 
+    attribute<symbol> filter{this, "filter", "",
+        description{"OSC address filter pattern (glob: * and ?). Empty = all pass. e.g. /foo/*"}
+    };
+
+    attribute<int> queuelimit{this, "queuelimit", 0,
+        description{"Max pending messages before dropping. 0 = unlimited"},
+        range{0, 100000}
+    };
+
     message<> close_msg{this, "close", "Close the socket",
         MIN_FUNCTION {
             close();
+            return {};
+        }
+    };
+
+    message<> dump_msg{this, "dump", "Print current status to console",
+        MIN_FUNCTION {
+            cout << "bbb.osc.receive status:" << endl;
+            cout << "  port: " << port << endl;
+            cout << "  bind_ip: " << to_string(bind_ip) << endl;
+            auto filt = to_string(filter);
+            cout << "  filter: " << (filt.empty() ? "(none)" : filt) << endl;
+            cout << "  queuelimit: " << queuelimit << endl;
+            cout << "  active: " << (receiver_ ? "yes" : "no") << endl;
+            if(receiver_) {
+                cout << "  shared callbacks: " << static_cast<int>(receiver_->callback_count()) << endl;
+            }
+            cout << "  pending messages: " << static_cast<int>(pending_.size()) << endl;
             return {};
         }
     };
@@ -164,7 +226,7 @@ private:
 
     timer<timer_options::defer_delivery> m_init_timer{this,
         MIN_FUNCTION {
-            init();
+            rebind(static_cast<int>(port), to_string(bind_ip));
             return {};
         }
     };
@@ -177,11 +239,6 @@ private:
         }
     };
 
-    void init() {
-        rebind(static_cast<int>(port), to_string(bind_ip));
-        m_poll_timer.delay(1);
-    }
-
     void rebind(int p, const std::string& ip) {
         close();
         auto recv = receiver_registry::shared().get(static_cast<std::uint16_t>(p), ip);
@@ -193,6 +250,9 @@ private:
         auto* self = this;
         receiver_->add_callback(self, [self](const bbb::osc::message& mess) {
             auto lock = std::lock_guard<std::mutex>(self->pending_mtx_);
+            if(self->queuelimit > 0 && self->pending_.size() >= static_cast<std::size_t>(static_cast<int>(self->queuelimit))) {
+                self->pending_.erase(self->pending_.begin());
+            }
             self->pending_.push_back(mess);
         });
         m_poll_timer.delay(1);
@@ -217,7 +277,9 @@ private:
             auto lock = std::lock_guard<std::mutex>(pending_mtx_);
             msgs.swap(pending_);
         }
+        auto filt = to_string(filter);
         for(const auto& mess : msgs) {
+            if(!filt.empty() && !glob_match(filt, mess.address)) continue;
             output_message(mess);
         }
     }
