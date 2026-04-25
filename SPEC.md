@@ -31,6 +31,7 @@ None.
 
 - `send /address args...` — Send OSC message with given address and arguments
 - `anything` — Selector is treated as OSC address, rest as arguments (udpsend convention)
+- `dump` — Print current status (host, port, @long, @double) to Max console
 
 #### Type mapping (inlet → OSC)
 
@@ -67,10 +68,13 @@ None. Parameters configured via attributes.
 |------|------|---------|-------------|
 | `port` | long | `9000` | UDP port to bind |
 | `bind_ip` | symbol | `"0.0.0.0"` | Local IP address of interface to bind |
+| `filter` | symbol | `""` | OSC address filter (glob pattern: `*` and `?`). Empty = all pass. e.g. `/foo/*` |
+| `queuelimit` | long | `0` | Max pending messages before dropping oldest. 0 = unlimited |
 
 #### Messages
 
 - `close` — Close the socket and stop receiving
+- `dump` — Print current status to Max console
 
 #### Type mapping (OSC → Max)
 
