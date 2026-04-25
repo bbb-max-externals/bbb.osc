@@ -81,6 +81,36 @@ Workaround:
 #include <bbb/osc.hpp>
 ```
 
+### CMake: add_library between pre/post target
+
+min-api's `min-pretarget.cmake` sets up project and flags but does NOT create the target.
+`min-posttarget.cmake` expects the target to exist. Must call `add_library()` between them:
+```cmake
+include(${C74_MIN_API_DIR}/script/min-pretarget.cmake)
+add_library(${PROJECT_NAME} MODULE ${SOURCE_FILES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${C74_INCLUDES})
+# ... other target settings ...
+include(${C74_MIN_API_DIR}/script/min-posttarget.cmake)
+```
+
+### attribute<symbol> → std::string
+
+`attribute<symbol>` cannot be directly converted to `std::string`. Use a helper:
+```cpp
+static std::string to_string(const symbol& s) {
+    return std::string((const char*)s);
+}
+```
+
+### Atom type dispatch
+
+min-api atoms use Max SDK types directly:
+```cpp
+if(arg.a_type == c74::max::A_LONG) { ... }
+else if(arg.a_type == c74::max::A_FLOAT) { ... }
+else if(arg.a_type == c74::max::A_SYM) { ... }
+```
+
 ### Main Thread Only for Outlets
 
 bbb-osc's receiver runs a background thread. Outlet output must happen on Max's main thread.
@@ -97,5 +127,13 @@ c74::min::timer<> m_init_timer{this, MIN_FUNCTION { init(); return {}; }};
 ### Thread Safety
 
 - `bbb::osc::receiver::queued_messages` is a `threaded_queue` (thread-safe)
+- `try_receive(msg, timeout)` requires 2 arguments (value + timeout in microseconds)
 - Multiple timer callbacks may call `broadcast_receiver::broadcast_update()` — use mutex
 - Outlet output is serialized by Max's main thread
+
+### min-api submodules
+
+min-api itself has submodules (max-sdk-base, readerwriterqueue, mock). Must run:
+```bash
+cd deps/min-api && git submodule update --init --recursive
+```

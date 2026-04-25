@@ -5,36 +5,36 @@
 - [x] Create README.md
 - [x] Create PLAN.md
 - [x] Create TODO.md
-- [ ] Initialize git submodules (min-api, bbb-osc)
-- [ ] Create root CMakeLists.txt
-- [ ] Create cmake/generate_version.cmake
-- [ ] Create package-info.json
+- [x] Initialize git submodules (min-api, bbb-osc)
+- [x] Create root CMakeLists.txt
+- [x] Create cmake/generate_version.cmake
+- [x] Create package-info.json
 
 ## bbb.osc.send
-- [ ] Create source/projects/bbb.osc.send/CMakeLists.txt
-- [ ] Implement bbb.osc.send.cpp
-  - [ ] NIL macro workaround
-  - [ ] host/port attributes with setter
-  - [ ] long/double attributes
-  - [ ] send message handler
-  - [ ] anything message handler
-  - [ ] Type coercion logic (atoms → bbb::osc::message)
+- [x] Create source/projects/bbb.osc.send/CMakeLists.txt
+- [x] Implement bbb.osc.send.cpp
+  - [x] NIL macro workaround
+  - [x] host/port attributes with setter
+  - [x] long/double attributes
+  - [x] send message handler
+  - [x] anything message handler
+  - [x] Type coercion logic (atoms → bbb::osc::message)
 
 ## bbb.osc.receive
-- [ ] Create source/projects/bbb.osc.receive/CMakeLists.txt
-- [ ] Implement bbb.osc.receive.cpp
-  - [ ] NIL macro workaround
-  - [ ] broadcast_receiver class
-  - [ ] receiver_registry singleton
-  - [ ] port/bind_ip attributes with setter
-  - [ ] Init timer pattern
-  - [ ] Periodic update timer
-  - [ ] Message → Max atoms conversion
-  - [ ] Left outlet output
-  - [ ] Right outlet output
-  - [ ] close message handler
-  - [ ] Destructor cleanup
+- [x] Create source/projects/bbb.osc.receive/CMakeLists.txt
+- [x] Implement bbb.osc.receive.cpp
+  - [x] NIL macro workaround
+  - [x] broadcast_receiver class
+  - [x] receiver_registry singleton
+  - [x] port/bind_ip attributes with setter
+  - [x] Init timer pattern
+  - [x] Periodic update timer
+  - [x] Message → Max atoms conversion
+  - [x] Left outlet output
+  - [x] Right outlet output
+  - [x] close message handler
+  - [x] Destructor cleanup
 
 ## Verification
-- [ ] Build succeeds
+- [x] Build succeeds (both .mxo generated)
 - [ ] Manual test in Max
