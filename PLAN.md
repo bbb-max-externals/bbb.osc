@@ -126,10 +126,29 @@ c74::min::timer<> m_init_timer{this, MIN_FUNCTION { init(); return {}; }};
 
 ### Thread Safety
 
-- `bbb::osc::receiver::queued_messages` is a `threaded_queue` (thread-safe)
-- `try_receive(msg, timeout)` requires 2 arguments (value + timeout in microseconds)
-- Multiple timer callbacks may call `broadcast_receiver::broadcast_update()` — use mutex
-- Outlet output is serialized by Max's main thread
+- `bbb::osc::receiver::queued_messages` is a `threaded_queue` (mutex-based, NOT lock-free)
+- Use `receive()` (non-blocking) instead of `try_receive(msg, 0)` to avoid condition_variable overhead
+- Background thread only touches `queued_messages` — never acquires registry or callback mutexes
+- All Max object operations (timer callbacks, destructors, attribute setters) run on the main thread
+
+### Shutdown / Close considerations
+
+- `close()` must call `m_poll_timer.stop()` to prevent timer firing after receiver is null
+- `rebind()` must restart poll timer with `m_poll_timer.delay(1)` after setting up new receiver
+- `receiver_registry::release()` must NOT hold registry mutex during thread join:
+  ```cpp
+  // Extract shared_ptr from map → release mutex → shared_ptr goes out of scope → close/join
+  std::shared_ptr<broadcast_receiver> to_destroy;
+  {
+      auto lock = std::lock_guard<std::mutex>(mtx_);
+      // find and extract...
+      receivers_.erase(it);
+  }
+  // to_destroy destroyed here, outside mutex: close() + join()
+  ```
+- `bbb::udp::receiver::close()` closes socket then joins background thread. Since socket is non-blocking,
+  the thread exits within ~1μs after `sock.close()` (loop checks `sock.is_open()`)
+- `bbb::udp::receiver::~receiver()` handles double-close safely (checks `is_open()` and `joinable()`)
 
 ### min-api submodules
 
