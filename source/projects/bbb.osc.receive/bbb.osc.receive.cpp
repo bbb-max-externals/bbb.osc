@@ -47,7 +47,7 @@ public:
         std::vector<bbb::osc::message> messages;
         {
             bbb::osc::message mess;
-            while(queued_messages.try_receive(mess, 0)) {
+            while(queued_messages.receive(mess)) {
                 messages.push_back(std::move(mess));
             }
         }
@@ -95,12 +95,15 @@ public:
     }
 
     void release(std::uint16_t port, const std::string& bind_ip) {
-        auto lock = std::lock_guard<std::mutex>(mtx_);
-        receiver_key key{port, bind_ip};
-        auto it = receivers_.find(key);
-        if(it != receivers_.end() && it->second->callback_count() == 0) {
-            it->second->close();
-            receivers_.erase(it);
+        std::shared_ptr<broadcast_receiver> to_destroy;
+        {
+            auto lock = std::lock_guard<std::mutex>(mtx_);
+            receiver_key key{port, bind_ip};
+            auto it = receivers_.find(key);
+            if(it != receivers_.end() && it->second->callback_count() == 0) {
+                to_destroy = it->second;
+                receivers_.erase(it);
+            }
         }
     }
 
@@ -192,9 +195,11 @@ private:
             auto lock = std::lock_guard<std::mutex>(self->pending_mtx_);
             self->pending_.push_back(mess);
         });
+        m_poll_timer.delay(1);
     }
 
     void close() {
+        m_poll_timer.stop();
         if(receiver_) {
             auto p = static_cast<std::uint16_t>(static_cast<int>(port));
             auto ip = to_string(bind_ip);
