@@ -1,0 +1,24 @@
+{
+    "title": "bbb.osc",
+    "description": "OSC send/receive externals for Max/MSP",
+    "author": "ISHII 2bit",
+    "website": "https://github.com/2bbb/bbb.osc",
+    "extends": "",
+    "extensible": 0,
+    "homepatcher": "",
+    "max_version_min": "8.0",
+    "os": {
+        "macintosh": {
+            "externals": [
+                "externals/"
+            ],
+            "help": [
+                "help/"
+            ]
+        }
+    },
+    "filelist": {
+        "externals/bbb.osc.send.mxo": {},
+        "externals/bbb.osc.receive.mxo": {}
+    }
+}
