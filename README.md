@@ -55,3 +55,13 @@ Copy the entire `bbb.osc` directory to `~/Documents/Max 8/Packages/` (or your pr
 ## License
 
 MIT License
+
+## Third-party Libraries
+
+| Library | License | Author |
+|---------|---------|--------|
+| [min-api](https://github.com/Cycling74/min-api) | MIT | Cycling74 |
+| [bbb-osc](https://github.com/2bbb/bbb-osc) | MIT | ISHII 2bit |
+| [Asio](https://github.com/chriskohlhoff/asio) (standalone) | BSL-1.0 | Christopher Kohlhoff |
+| [oscpp](https://github.com/kronihk/oscpp) | MIT | Stefan Kersten |
+| [bit_by_bit](https://github.com/2bbb/bit_by_bit) | MIT | ISHII 2bit |
