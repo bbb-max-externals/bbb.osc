@@ -15,10 +15,20 @@
             "help": [
                 "help/"
             ]
+        },
+        "windows": {
+            "externals": [
+                "externals/"
+            ],
+            "help": [
+                "help/"
+            ]
         }
     },
     "filelist": {
         "externals/bbb.osc.send.mxo": {},
-        "externals/bbb.osc.receive.mxo": {}
+        "externals/bbb.osc.receive.mxo": {},
+        "externals/bbb.osc.send.mxe64": {},
+        "externals/bbb.osc.receive.mxe64": {}
     }
 }

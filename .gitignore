@@ -2,4 +2,5 @@ build/
 externals/
 .DS_Store
 *.mxo
+*.mxe64
 source/bbb/version.h
