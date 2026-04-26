@@ -100,6 +100,11 @@ macro(bbb_add_external)
         endforeach()
     endforeach()
 
+    # --- MSVC: report correct __cplusplus value ---
+    if(MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+    endif()
+
     # --- build library ---
     add_library(${PROJECT_NAME} MODULE ${_bbb_sources})
 
