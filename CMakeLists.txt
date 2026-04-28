@@ -10,6 +10,9 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bbb_external.cmake)
 # --- output directory ---
 set(C74_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/externals)
 
+# --- shared include paths ---
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source)
+
 # --- version generation ---
 string(MAKE_C_IDENTIFIER "${PROJECT_NAME}" BBB_PACKAGE_NAME_UPPER)
 string(TOUPPER "${BBB_PACKAGE_NAME_UPPER}" BBB_PACKAGE_NAME_UPPER)

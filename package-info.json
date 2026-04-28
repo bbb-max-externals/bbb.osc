@@ -28,7 +28,29 @@
     "filelist": {
         "externals/bbb.osc.send.mxo": {},
         "externals/bbb.osc.receive.mxo": {},
+        "externals/bbb.osc.path.join.mxo": {},
+        "externals/bbb.osc.path.unjoin.mxo": {},
+        "externals/bbb.osc.path.append.mxo": {},
+        "externals/bbb.osc.path.prepend.mxo": {},
+        "externals/bbb.osc.path.removehead.mxo": {},
+        "externals/bbb.osc.path.removetail.mxo": {},
+        "externals/bbb.osc.path.head.mxo": {},
+        "externals/bbb.osc.path.tail.mxo": {},
+        "externals/bbb.osc.path.strip.mxo": {},
+        "externals/bbb.osc.path.prefix.mxo": {},
+        "externals/bbb.osc.path.route.mxo": {},
         "externals/bbb.osc.send.mxe64": {},
-        "externals/bbb.osc.receive.mxe64": {}
+        "externals/bbb.osc.receive.mxe64": {},
+        "externals/bbb.osc.path.join.mxe64": {},
+        "externals/bbb.osc.path.unjoin.mxe64": {},
+        "externals/bbb.osc.path.append.mxe64": {},
+        "externals/bbb.osc.path.prepend.mxe64": {},
+        "externals/bbb.osc.path.removehead.mxe64": {},
+        "externals/bbb.osc.path.removetail.mxe64": {},
+        "externals/bbb.osc.path.head.mxe64": {},
+        "externals/bbb.osc.path.tail.mxe64": {},
+        "externals/bbb.osc.path.strip.mxe64": {},
+        "externals/bbb.osc.path.prefix.mxe64": {},
+        "externals/bbb.osc.path.route.mxe64": {}
     }
 }
