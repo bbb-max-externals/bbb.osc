@@ -45,4 +45,17 @@ foreach(project_dir ${PROJECT_DIRS})
 	endif()
 endforeach()
 
+option(BBB_OSC_BUILD_TESTS "Build bbb.osc tests" OFF)
+
+if(BBB_OSC_BUILD_TESTS)
+	enable_testing()
+	set(CMAKE_EXE_LINKER_FLAGS "")
+	foreach(config DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+		set(CMAKE_EXE_LINKER_FLAGS_${config} "")
+	endforeach()
+	add_executable(bbb_osc_path_tests tests/osc_path_tests.cpp)
+	target_include_directories(bbb_osc_path_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
+	add_test(NAME bbb_osc_path_tests COMMAND bbb_osc_path_tests)
+endif()
+
 set(CMAKE_SUPPRESS_REGENERATION true)

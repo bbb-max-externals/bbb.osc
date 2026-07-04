@@ -10,21 +10,21 @@ namespace bbb { namespace osc { namespace path {
 
 inline std::string normalize(const std::string& path) {
     if(path.empty()) return "/";
-    std::string result;
+    std::string result{"/"};
     result.reserve(path.size() + 1);
-    // ensure leading /
-    bool started = false;
+    bool previous_slash = true;
     for(char c : path) {
         if(c == '/') {
-            if(!started) { result += '/'; started = true; }
-            else if(result.back() != '/') { result += '/'; }
+            if(!previous_slash) {
+                result += '/';
+                previous_slash = true;
+            }
         } else {
             result += c;
-            started = true;
+            previous_slash = false;
         }
     }
     while(result.size() > 1 && result.back() == '/') result.pop_back();
-    if(result.empty()) return "/";
     return result;
 }
 
@@ -115,14 +115,16 @@ inline std::string tail(const std::string& path, size_t n) {
 inline bool starts_with_component(const std::string& path, const std::string& prefix) {
     std::string np = normalize(path);
     std::string npfx = normalize(prefix);
+    if(npfx == "/") return true;
     if(np == npfx) return true;
-    if(np.size() > npfx.size()) return false;
+    if(np.size() <= npfx.size()) return false;
     return np.compare(0, npfx.size(), npfx) == 0 && np[npfx.size()] == '/';
 }
 
 inline std::string strip_prefix(const std::string& path, const std::string& prefix) {
     std::string np = normalize(path);
     std::string npfx = normalize(prefix);
+    if(npfx == "/") return np;
     if(np == npfx) return "/";
     if(np.size() > npfx.size() && np.compare(0, npfx.size(), npfx) == 0 && np[npfx.size()] == '/') {
         return normalize(np.substr(npfx.size()));
