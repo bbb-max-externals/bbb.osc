@@ -1,5 +1,8 @@
 # bbb.osc
 
+> [!WARNING]
+> This repository is published as AI-assisted, insufficiently tested work in progress ("AI slop"). Treat it as experimental. Correctness, stability, compatibility, and fitness for production use are not guaranteed.
+
 OSC send/receive externals for Max/MSP.
 
 Built with [min-api](https://github.com/Cycling74/min-api) and [bbb-osc](https://github.com/2bbb/bbb-osc).
