@@ -39,7 +39,7 @@ bbb.osc.receive @port 9000 @bind_ip 0.0.0.0
 ## Build
 
 ```bash
-git clone --recursive https://github.com/2bbb/bbb.osc.git
+git clone --recursive https://github.com/bbb-max-externals/bbb.osc.git
 cd bbb.osc
 mkdir build && cd build
 cmake ..

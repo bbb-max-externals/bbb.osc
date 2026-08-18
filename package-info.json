@@ -2,7 +2,7 @@
     "title": "bbb.osc",
     "description": "OSC send/receive externals for Max/MSP",
     "author": "ISHII 2bit",
-    "website": "https://github.com/2bbb/bbb.osc",
+    "website": "https://github.com/bbb-max-externals/bbb.osc",
     "extends": "",
     "extensible": 0,
     "homepatcher": "",
