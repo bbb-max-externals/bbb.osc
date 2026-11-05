@@ -172,7 +172,7 @@ public:
         description{"Local IP address of interface to bind"},
         setter{[this](const atoms& args, int) -> atoms {
             if(args.size() > 0) {
-                rebind(static_cast<int>(port), to_string(bind_ip));
+                rebind(static_cast<int>(port), to_string(symbol(args[0])));
             }
             return args;
         }}
@@ -302,7 +302,7 @@ private:
                         osc_args.push_back(atom(static_cast<int>(arg.num.i)));
                         break;
                     case bbb::osc::Tag::Int64:
-                        osc_args.push_back(atom(static_cast<int>(arg.num.l)));
+                        osc_args.push_back(atom(static_cast<long long>(arg.num.l)));
                         break;
                     case bbb::osc::Tag::Char:
                         osc_args.push_back(atom(static_cast<int>(arg.num.c)));
