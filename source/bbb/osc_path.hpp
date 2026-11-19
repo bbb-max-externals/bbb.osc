@@ -59,6 +59,11 @@ inline std::string join(const std::vector<std::string>& components) {
     return result.empty() ? "/" : result;
 }
 
+inline std::string join(const std::vector<std::string>& components, bool normalize_result) {
+    auto path = join(components);
+    return normalize_result ? normalize(path) : path;
+}
+
 // --- Component count ---
 
 inline size_t depth(const std::string& path) {

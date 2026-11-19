@@ -51,7 +51,7 @@ public:
                 }
             }
 
-            std::string joined = normalize_attr ? bbb::osc::path::join(components) : bbb::osc::path::join(components);
+            std::string joined = bbb::osc::path::join(components, normalize_attr);
 
             atoms result;
             result.push_back(symbol(joined));

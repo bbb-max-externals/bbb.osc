@@ -56,6 +56,17 @@ if(BBB_OSC_BUILD_TESTS)
 	add_executable(bbb_osc_path_tests tests/osc_path_tests.cpp)
 	target_include_directories(bbb_osc_path_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
 	add_test(NAME bbb_osc_path_tests COMMAND bbb_osc_path_tests)
+	add_executable(bbb_osc_decode_tests tests/osc_decode_tests.cpp)
+	target_compile_features(bbb_osc_decode_tests PRIVATE cxx_std_17)
+	if(MSVC)
+		target_compile_options(bbb_osc_decode_tests PRIVATE /Zc:__cplusplus)
+	endif()
+	set(osc_dep "${CMAKE_CURRENT_SOURCE_DIR}/deps/bbb-osc")
+	target_include_directories(bbb_osc_decode_tests PRIVATE
+		${osc_dep}/include ${osc_dep}/third-party/oscpp/include
+		${osc_dep}/third-party/asio/include ${osc_dep}/third-party/bit_by_bit/include)
+	add_test(NAME bbb_osc_decode_tests COMMAND bbb_osc_decode_tests)
+	set_tests_properties(bbb_osc_decode_tests PROPERTIES TIMEOUT 5)
 endif()
 
 set(CMAKE_SUPPRESS_REGENERATION true)
