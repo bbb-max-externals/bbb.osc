@@ -67,6 +67,11 @@ void test_normalize() {
 }
 
 void test_split_join_depth() {
+    std::vector<std::string> edges{"", "/stage/", "", "/front/", ""};
+    expect_equal_string(bbb::osc::path::join(edges, true), "/stage/front", "join normalizes on request");
+    expect_equal_string(bbb::osc::path::join(edges, false), "/stage//front/", "raw join keeps separators");
+    for(bool normalize : {false, true})
+        expect_equal_string(bbb::osc::path::join({"", ""}, normalize), "/", "empty elements join to root");
     expect_components(bbb::osc::path::split("/"), {}, "root split is empty");
     expect_components(bbb::osc::path::split("foo/bar"), {"foo", "bar"}, "relative split is component-safe");
     expect_components(bbb::osc::path::split("///foo//bar///"), {"foo", "bar"}, "split normalizes duplicate slashes");
